@@ -1,8 +1,10 @@
 package com.darae.tourweather.weather;
 
 import com.darae.tourweather.weather.dto.WeatherResponse;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -11,7 +13,9 @@ public class WeatherController {
 
     private final WeatherService weatherService;
 
-    public WeatherController(WeatherService weatherService) {
+    public WeatherController(
+            WeatherService weatherService
+    ) {
         this.weatherService = weatherService;
     }
 
@@ -21,7 +25,10 @@ public class WeatherController {
     }
 
     @GetMapping
-    public WeatherResponse getWeather() {
-        return weatherService.getWeather();
+    public WeatherResponse getWeather(
+            @RequestParam int nx,
+            @RequestParam int ny
+    ) {
+        return weatherService.getWeather(nx, ny);
     }
 }
