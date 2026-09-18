@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import com.darae.tourweather.weather.dto.WeatherResponse;
+import com.darae.tourweather.tourspot.dto.TourSpotWeatherResponse;
 import com.darae.tourweather.tourspot.dto.TourSpotResponse;
 
 @RestController
@@ -28,7 +28,7 @@ public class TourSpotController {
     }
 
     @GetMapping("/{id}/weather")
-    public WeatherResponse getWeather(
+    public TourSpotWeatherResponse getWeather(
             @PathVariable Long id) {
         return tourSpotService.getWeather(id);
     }

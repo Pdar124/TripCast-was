@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.darae.tourweather.tourspot.dto.TourSpotResponse;
+import com.darae.tourweather.tourspot.dto.TourSpotWeatherResponse;
 import com.darae.tourweather.weather.WeatherService;
 import com.darae.tourweather.weather.dto.WeatherResponse;
 import com.darae.tourweather.weather.util.GridCoordinate;
@@ -31,17 +32,26 @@ public class TourSpotService {
                 .toList();
     }
 
-    public WeatherResponse getWeather(Long tourSpotId) {
+    public TourSpotWeatherResponse getWeather(
+            Long tourSpotId) {
         TourSpot tourSpot = tourSpotRepository
                 .findById(tourSpotId)
-                .orElseThrow(() -> new TourSpotNotFoundException(tourSpotId));
+                .orElseThrow(() -> new TourSpotNotFoundException(
+                        tourSpotId));
 
         GridCoordinate grid = LatLonToGridConverter.convert(
                 tourSpot.getLatitude(),
                 tourSpot.getLongitude());
 
-        return weatherService.getWeather(
+        WeatherResponse weather = weatherService.getWeather(
                 grid.nx(),
                 grid.ny());
+
+        return new TourSpotWeatherResponse(
+                tourSpot.getId(),
+                tourSpot.getName(),
+                tourSpot.getLatitude(),
+                tourSpot.getLongitude(),
+                weather);
     }
 }
