@@ -18,8 +18,7 @@ public class TourSpotService {
 
     public TourSpotService(
             TourSpotRepository tourSpotRepository,
-            WeatherService weatherService
-    ) {
+            WeatherService weatherService) {
         this.tourSpotRepository = tourSpotRepository;
         this.weatherService = weatherService;
     }
@@ -35,22 +34,14 @@ public class TourSpotService {
     public WeatherResponse getWeather(Long tourSpotId) {
         TourSpot tourSpot = tourSpotRepository
                 .findById(tourSpotId)
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "관광지를 찾을 수 없습니다: "
-                                        + tourSpotId
-                        )
-                );
+                .orElseThrow(() -> new TourSpotNotFoundException(tourSpotId));
 
-        GridCoordinate grid =
-                LatLonToGridConverter.convert(
-                        tourSpot.getLatitude(),
-                        tourSpot.getLongitude()
-                );
+        GridCoordinate grid = LatLonToGridConverter.convert(
+                tourSpot.getLatitude(),
+                tourSpot.getLongitude());
 
         return weatherService.getWeather(
                 grid.nx(),
-                grid.ny()
-        );
+                grid.ny());
     }
 }
