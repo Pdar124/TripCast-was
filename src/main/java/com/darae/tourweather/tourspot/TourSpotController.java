@@ -6,7 +6,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PathVariable;
 
+import com.darae.tourweather.weather.dto.WeatherResponse;
 import com.darae.tourweather.tourspot.dto.TourSpotResponse;
 
 @RestController
@@ -21,8 +23,13 @@ public class TourSpotController {
 
     @GetMapping
     public List<TourSpotResponse> search(
-            @RequestParam String keyword
-    ) {
+            @RequestParam String keyword) {
         return tourSpotService.search(keyword);
+    }
+
+    @GetMapping("/{id}/weather")
+    public WeatherResponse getWeather(
+            @PathVariable Long id) {
+        return tourSpotService.getWeather(id);
     }
 }
