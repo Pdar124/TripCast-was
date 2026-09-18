@@ -1,8 +1,9 @@
 package com.darae.tourweather.tourspot;
 
-import java.util.List;
-
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import com.darae.tourweather.tourspot.dto.TourSpotResponse;
 import com.darae.tourweather.tourspot.dto.TourSpotWeatherResponse;
@@ -24,12 +25,20 @@ public class TourSpotService {
         this.weatherService = weatherService;
     }
 
-    public List<TourSpotResponse> search(String keyword) {
+    public Page<TourSpotResponse> search(
+            String keyword,
+            int page,
+            int size) {
+        PageRequest pageRequest = PageRequest.of(
+                page,
+                size,
+                Sort.by("name").ascending());
+
         return tourSpotRepository
-                .findByNameContaining(keyword)
-                .stream()
-                .map(TourSpotResponse::from)
-                .toList();
+                .findByNameContaining(
+                        keyword,
+                        pageRequest)
+                .map(TourSpotResponse::from);
     }
 
     public TourSpotWeatherResponse getWeather(
