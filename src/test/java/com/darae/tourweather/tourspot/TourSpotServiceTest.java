@@ -3,18 +3,27 @@ package com.darae.tourweather.tourspot;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
+import com.darae.tourweather.tourspot.dto.TourSpotResponse;
 import com.darae.tourweather.tourspot.dto.TourSpotWeatherResponse;
 import com.darae.tourweather.weather.WeatherService;
 import com.darae.tourweather.weather.dto.WeatherResponse;
@@ -30,6 +39,59 @@ class TourSpotServiceTest {
 
     @InjectMocks
     private TourSpotService tourSpotService;
+
+    @Test
+    void 관광지를_이름으로_페이지_검색한다() {
+        TourSpot tourSpot = new TourSpot(
+                "서울시청",
+                37.5665,
+                126.9780);
+
+        PageRequest repositoryPageRequest = PageRequest.of(
+                2,
+                10,
+                Sort.by("name").ascending());
+        Page<TourSpot> repositoryResult = new PageImpl<>(
+                List.of(tourSpot),
+                repositoryPageRequest,
+                21);
+
+        when(tourSpotRepository.findByNameContaining(
+                eq("서울"),
+                org.mockito.ArgumentMatchers.any(Pageable.class)))
+                .thenReturn(repositoryResult);
+
+        Page<TourSpotResponse> result = tourSpotService.search(
+                "서울",
+                2,
+                10);
+
+        assertAll(
+                () -> assertEquals(2, result.getNumber()),
+                () -> assertEquals(10, result.getSize()),
+                () -> assertEquals(21, result.getTotalElements()),
+                () -> assertEquals(1, result.getContent().size()),
+                () -> assertEquals(
+                        "서울시청",
+                        result.getContent().get(0).name()));
+
+        ArgumentCaptor<Pageable> pageableCaptor =
+                ArgumentCaptor.forClass(Pageable.class);
+
+        verify(tourSpotRepository).findByNameContaining(
+                eq("서울"),
+                pageableCaptor.capture());
+
+        Pageable pageable = pageableCaptor.getValue();
+        assertAll(
+                () -> assertEquals(2, pageable.getPageNumber()),
+                () -> assertEquals(10, pageable.getPageSize()),
+                () -> assertEquals(
+                        Sort.Direction.ASC,
+                        pageable.getSort()
+                                .getOrderFor("name")
+                                .getDirection()));
+    }
 
     @Test
     void 관광지_좌표를_변환해서_날씨를_조회한다() {
