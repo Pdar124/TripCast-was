@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -50,8 +51,8 @@ class ClimateIndexSyncServiceTest {
                 "서울 종로구",
                 "서울",
                 "종로구",
-                "52",
-                "0"
+                "0.44",
+                "매우좋음"
         );
 
         when(courseStopRepository.findDistinctRegionIds())
@@ -88,8 +89,11 @@ class ClimateIndexSyncServiceTest {
                 () -> assertEquals(1, result.failedRegions()),
                 () -> assertEquals("1111000000", saved.getRegionId()),
                 () -> assertEquals(LocalDate.of(2026, 9, 20), saved.getBaseDate()),
-                () -> assertEquals(52, saved.getScore()),
-                () -> assertEquals("0", saved.getGrade())
+                () -> assertEquals(
+                        new BigDecimal("0.44"),
+                        saved.getScore()
+                ),
+                () -> assertEquals("매우좋음", saved.getGrade())
         );
     }
 
@@ -100,7 +104,7 @@ class ClimateIndexSyncServiceTest {
         RegionClimateIndex existing = new RegionClimateIndex(
                 "1111000000",
                 baseDate,
-                40,
+                new BigDecimal("0.40"),
                 "기존"
         );
         Item item = new Item(
@@ -109,7 +113,7 @@ class ClimateIndexSyncServiceTest {
                 "서울 종로구",
                 "서울",
                 "종로구",
-                "61.4",
+                "0.61",
                 "좋음"
         );
 
@@ -133,7 +137,10 @@ class ClimateIndexSyncServiceTest {
 
         assertAll(
                 () -> assertSame(existing, captor.getValue()),
-                () -> assertEquals(61, existing.getScore()),
+                () -> assertEquals(
+                        new BigDecimal("0.61"),
+                        existing.getScore()
+                ),
                 () -> assertEquals("좋음", existing.getGrade())
         );
     }

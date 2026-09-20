@@ -27,13 +27,13 @@ class TourClimateApiResponseTest {
                       "items": {
                         "item": [
                           {
-                            "tm": "2026-09-20 06:00",
+                            "tm": "2026-09-22 00:00",
                             "totalCityName": "제주 서귀포시",
                             "doName": "제주",
                             "cityName": "서귀포시",
                             "cityAreaId": "5013000000",
-                            "kmaTci": "52",
-                            "TCI_GRADE": "0"
+                            "kmaTci": "0.44",
+                            "TCI_GRADE": "매우좋음"
                           }
                         ]
                       },
@@ -54,8 +54,8 @@ class TourClimateApiResponseTest {
         assertAll(
                 () -> assertEquals("5013000000", item.cityAreaId()),
                 () -> assertEquals("제주 서귀포시", item.totalCityName()),
-                () -> assertEquals("52", item.kmaTci()),
-                () -> assertEquals("0", item.tciGrade())
+                () -> assertEquals("0.44", item.kmaTci()),
+                () -> assertEquals("매우좋음", item.tciGrade())
         );
     }
 
@@ -74,8 +74,8 @@ class TourClimateApiResponseTest {
                         "item": {
                           "tm": "2026-09-21 06:00",
                           "cityAreaId": "5013000000",
-                          "kmaTci": "52",
-                          "TCI_GRADE": "0"
+                          "kmaTci": "0.44",
+                          "TCI_GRADE": "매우좋음"
                         }
                       },
                       "numOfRows": 10,

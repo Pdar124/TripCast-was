@@ -41,7 +41,7 @@ erDiagram
         bigint id PK
         varchar region_id "UK(region_id+base_date)"
         date base_date
-        int score
+        decimal score
         varchar grade "API의 TCI_GRADE 원문"
     }
 
@@ -91,7 +91,7 @@ CREATE TABLE region_climate_index (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     region_id VARCHAR(20) NOT NULL,
     base_date DATE NOT NULL,
-    score INT NOT NULL,
+    score DECIMAL(5, 2) NOT NULL,
     grade VARCHAR(20) NOT NULL,
     CONSTRAINT uk_region_climate_date UNIQUE (region_id, base_date)
 );
@@ -179,7 +179,7 @@ CREATE TABLE spot_weather_index (
 | id | BIGINT | ● | | N | 내부 식별자 (Auto Increment) |
 | region_id | VARCHAR(20) | | | N | 시군구 코드 (`tour_course_stop.region_id`와 값으로 연결, FK 아님) |
 | base_date | DATE | | | N | 지수 기준일 |
-| score | INT | | | N | 관광기후지수 점수 |
+| score | DECIMAL(5, 2) | | | N | 관광기후지수 점수 (`kmaTci`, 예: `0.44`) |
 | grade | VARCHAR(20) | | | N | 공공데이터포털 응답의 `TCI_GRADE` 원문 |
 
 **인덱스/제약**

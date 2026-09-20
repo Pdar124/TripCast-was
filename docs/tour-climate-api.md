@@ -10,6 +10,11 @@ TripCast는 공공데이터포털의 `기상청_관광코스별 관광지 상세
 - 인증 파라미터: `ServiceKey`
 - 주요 응답 필드: `tm`, `cityAreaId`, `kmaTci`, `TCI_GRADE`
 
+2026-09-21 실제 호출에서 `tm=2026-09-22 00:00`,
+`cityAreaId=5013000000`, `kmaTci=0.44`, `TCI_GRADE=매우좋음`을
+확인했다. `kmaTci`는 정수가 아닌 소수이므로 DB와 API 응답에서
+`DECIMAL(5, 2)`/`BigDecimal`로 보존한다.
+
 공공데이터포털의 현재 Swagger에는 동네예보와 시군구별 관광기후지수 기능만 공개되어 있다. 기존 DB 설계에 있는 관광지별 `feelsLikeTemp`, `uvIndex`는 대응하는 현재 공개 응답 필드가 없으므로 `spot_weather_index` 구조만 유지하며 배치에서 임의 값을 저장하지 않는다.
 
 ## 실행 설정

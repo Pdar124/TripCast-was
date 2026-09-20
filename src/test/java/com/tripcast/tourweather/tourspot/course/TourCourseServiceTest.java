@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -57,8 +58,8 @@ class TourCourseServiceTest {
         ClimateIndexResponse climateIndex = new ClimateIndexResponse(
                 "1111000000",
                 LocalDate.of(2026, 9, 20),
-                82,
-                "매우 좋음"
+                new BigDecimal("0.82"),
+                "매우좋음"
         );
 
         when(courseRepository.findById(1L))

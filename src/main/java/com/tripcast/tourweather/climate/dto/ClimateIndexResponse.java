@@ -1,5 +1,6 @@
 package com.tripcast.tourweather.climate.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import com.tripcast.tourweather.climate.domain.RegionClimateIndex;
@@ -7,7 +8,7 @@ import com.tripcast.tourweather.climate.domain.RegionClimateIndex;
 public record ClimateIndexResponse(
         String regionId,
         LocalDate date,
-        int score,
+        BigDecimal score,
         String grade
 ) {
     public static ClimateIndexResponse from(RegionClimateIndex climateIndex) {

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -104,8 +105,8 @@ class ClimateIndexSyncIntegrationTest {
                 requestTime,
                 1
         )).thenReturn(
-                List.of(item("52", "보통")),
-                List.of(item("65", "좋음"))
+                List.of(item("0.44", "매우좋음")),
+                List.of(item("0.65", "좋음"))
         );
 
         ClimateIndexSyncResult first = climateIndexSyncService.sync(
@@ -128,7 +129,10 @@ class ClimateIndexSyncIntegrationTest {
                 () -> assertEquals(1, first.requestedRegions()),
                 () -> assertEquals(1, second.requestedRegions()),
                 () -> assertEquals(1, climateIndexRepository.count()),
-                () -> assertEquals(65, saved.getScore()),
+                () -> assertEquals(
+                        new BigDecimal("0.65"),
+                        saved.getScore()
+                ),
                 () -> assertEquals("좋음", saved.getGrade())
         );
     }

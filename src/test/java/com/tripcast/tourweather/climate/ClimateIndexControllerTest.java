@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -31,16 +32,16 @@ class ClimateIndexControllerTest {
                 .thenReturn(new ClimateIndexResponse(
                         "1111000000",
                         LocalDate.of(2026, 9, 20),
-                        82,
-                        "매우 좋음"
+                        new BigDecimal("0.82"),
+                        "매우좋음"
                 ));
 
         mockMvc.perform(get("/api/regions/1111000000/climate-index"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.regionId").value("1111000000"))
                 .andExpect(jsonPath("$.date").value("2026-09-20"))
-                .andExpect(jsonPath("$.score").value(82))
-                .andExpect(jsonPath("$.grade").value("매우 좋음"));
+                .andExpect(jsonPath("$.score").value(0.82))
+                .andExpect(jsonPath("$.grade").value("매우좋음"));
     }
 
     @Test
@@ -67,13 +68,13 @@ class ClimateIndexControllerTest {
                 new ClimateIndexResponse(
                         "1111000000",
                         LocalDate.of(2026, 9, 19),
-                        65,
+                        new BigDecimal("0.65"),
                         "좋음"
                 ),
                 new ClimateIndexResponse(
                         "1111000000",
                         LocalDate.of(2026, 9, 20),
-                        52,
+                        new BigDecimal("0.52"),
                         "보통"
                 )
         ));

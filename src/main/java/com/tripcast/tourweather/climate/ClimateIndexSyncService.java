@@ -1,7 +1,6 @@
 package com.tripcast.tourweather.climate;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -92,7 +91,7 @@ public class ClimateIndexSyncService {
                 ? item.cityAreaId()
                 : requestedRegionId;
         LocalDate baseDate = parseBaseDate(item.tm());
-        int score = parseScore(item.kmaTci());
+        BigDecimal score = parseScore(item.kmaTci());
         String grade = requireText(item.tciGrade(), "tciGrade");
 
         RegionClimateIndex climateIndex = climateIndexRepository
@@ -134,13 +133,11 @@ public class ClimateIndexSyncService {
         );
     }
 
-    private int parseScore(String value) {
+    private BigDecimal parseScore(String value) {
         String score = requireText(value, "kmaTci");
         try {
-            return new BigDecimal(score)
-                    .setScale(0, RoundingMode.HALF_UP)
-                    .intValueExact();
-        } catch (ArithmeticException | NumberFormatException exception) {
+            return new BigDecimal(score);
+        } catch (NumberFormatException exception) {
             throw new IllegalArgumentException(
                     "관광기후지수 점수 형식이 올바르지 않습니다: " + score,
                     exception

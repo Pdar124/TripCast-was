@@ -1,5 +1,6 @@
 package com.tripcast.tourweather.climate.domain;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import jakarta.persistence.Column;
@@ -30,8 +31,8 @@ public class RegionClimateIndex {
     @Column(name = "base_date", nullable = false)
     private LocalDate baseDate;
 
-    @Column(nullable = false)
-    private int score;
+    @Column(nullable = false, precision = 5, scale = 2)
+    private BigDecimal score;
 
     @Column(nullable = false, length = 20)
     private String grade;
@@ -42,7 +43,7 @@ public class RegionClimateIndex {
     public RegionClimateIndex(
             String regionId,
             LocalDate baseDate,
-            int score,
+            BigDecimal score,
             String grade
     ) {
         this.regionId = regionId;
@@ -51,7 +52,7 @@ public class RegionClimateIndex {
         this.grade = grade;
     }
 
-    public void update(int score, String grade) {
+    public void update(BigDecimal score, String grade) {
         this.score = score;
         this.grade = grade;
     }
@@ -68,7 +69,7 @@ public class RegionClimateIndex {
         return baseDate;
     }
 
-    public int getScore() {
+    public BigDecimal getScore() {
         return score;
     }
 
