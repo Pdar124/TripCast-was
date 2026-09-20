@@ -7,6 +7,7 @@ import org.springframework.data.domain.Sort;
 
 import com.tripcast.tourweather.climate.ClimateIndexService;
 import com.tripcast.tourweather.climate.dto.ClimateIndexResponse;
+import com.tripcast.tourweather.climate.util.ClimateRegionIdNormalizer;
 import com.tripcast.tourweather.tourspot.course.TourCourseStopRepository;
 import com.tripcast.tourweather.tourspot.dto.TourSpotResponse;
 import com.tripcast.tourweather.tourspot.dto.TourSpotWeatherResponse;
@@ -68,7 +69,9 @@ public class TourSpotService {
         ClimateIndexResponse climateIndex = courseStopRepository
                 .findFirstByTourSpotIdOrderByIdAsc(tourSpotId)
                 .map(stop -> climateIndexService.findLatestOrNull(
-                        stop.getRegionId()
+                        ClimateRegionIdNormalizer.normalize(
+                                stop.getRegionId()
+                        )
                 ))
                 .orElse(null);
 

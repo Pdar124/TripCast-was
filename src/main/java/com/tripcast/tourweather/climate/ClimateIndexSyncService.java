@@ -17,6 +17,7 @@ import com.tripcast.tourweather.climate.client.TourWeatherIndexClient;
 import com.tripcast.tourweather.climate.client.dto.TourClimateApiResponse.Item;
 import com.tripcast.tourweather.climate.domain.RegionClimateIndex;
 import com.tripcast.tourweather.climate.repository.RegionClimateIndexRepository;
+import com.tripcast.tourweather.climate.util.ClimateRegionIdNormalizer;
 import com.tripcast.tourweather.tourspot.course.TourCourseStopRepository;
 
 @Service
@@ -47,7 +48,12 @@ public class ClimateIndexSyncService {
             LocalDateTime currentDate,
             int forecastDays
     ) {
-        List<String> regionIds = courseStopRepository.findDistinctRegionIds();
+        List<String> regionIds = courseStopRepository
+                .findDistinctRegionIds()
+                .stream()
+                .map(ClimateRegionIdNormalizer::normalize)
+                .distinct()
+                .toList();
         int successfulRegions = 0;
         int savedRecords = 0;
 

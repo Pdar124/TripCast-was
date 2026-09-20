@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.tripcast.tourweather.climate.ClimateIndexService;
 import com.tripcast.tourweather.climate.dto.ClimateIndexResponse;
+import com.tripcast.tourweather.climate.util.ClimateRegionIdNormalizer;
 import com.tripcast.tourweather.tourspot.TourSpot;
 import com.tripcast.tourweather.tourspot.course.dto.TourCourseResponse;
 import com.tripcast.tourweather.tourspot.course.dto.TourCourseStopResponse;
@@ -91,9 +92,12 @@ public class TourCourseService {
             TourCourseStop stop,
             Map<String, Optional<ClimateIndexResponse>> climateByRegion
     ) {
+        String climateRegionId = ClimateRegionIdNormalizer.normalize(
+                stop.getRegionId()
+        );
         Optional<ClimateIndexResponse> climateIndex = climateByRegion
                 .computeIfAbsent(
-                        stop.getRegionId(),
+                        climateRegionId,
                         regionId -> Optional.ofNullable(
                                 climateIndexService.findLatestOrNull(regionId)
                         )
