@@ -1,7 +1,11 @@
 package com.tripcast.tourweather.climate;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -42,6 +46,20 @@ class TourWeatherIndexClientPocTest {
 
         assertFalse(items.isEmpty());
         Item item = items.getFirst();
+        assertAll(
+                () -> assertTrue(item.tm() != null && !item.tm().isBlank()),
+                () -> assertTrue(
+                        item.cityAreaId() != null
+                                && !item.cityAreaId().isBlank()
+                ),
+                () -> assertDoesNotThrow(
+                        () -> new BigDecimal(item.kmaTci())
+                ),
+                () -> assertTrue(
+                        item.tciGrade() != null
+                                && !item.tciGrade().isBlank()
+                )
+        );
         System.out.printf(
                 "tour-climate-poc tm=%s cityAreaId=%s kmaTci=%s tciGrade=%s%n",
                 item.tm(),

@@ -2,6 +2,7 @@ package com.tripcast.tourweather;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,13 @@ class OpenApiContractTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Test
+    void Swagger_UI_진입_경로가_정상적으로_열린다() throws Exception {
+        mockMvc.perform(get("/swagger-ui.html"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/swagger-ui/index.html"));
+    }
 
     @Test
     void 신규_관광코스와_관광기후지수_API가_OpenAPI에_노출된다()
