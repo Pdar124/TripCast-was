@@ -11,6 +11,8 @@ import com.tripcast.tourweather.climate.domain.RegionClimateIndex;
 public interface RegionClimateIndexRepository
         extends JpaRepository<RegionClimateIndex, Long> {
 
+    boolean existsByRegionId(String regionId);
+
     Optional<RegionClimateIndex> findByRegionIdAndBaseDate(
             String regionId,
             LocalDate baseDate

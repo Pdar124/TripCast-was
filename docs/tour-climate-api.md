@@ -17,7 +17,7 @@ TripCast는 공공데이터포털의 `기상청_관광코스별 관광지 상세
 API 키를 환경 변수로 설정한 뒤 배치를 활성화한다. 키는 설정 파일이나 Git에 직접 기록하지 않는다.
 
 ```powershell
-$env:TOUR_CLIMATE_API_KEY="발급받은 일반 인증키"
+$env:TOUR_CLIMATE_API_KEY="발급받은 일반 인증키 Decoding 값"
 ```
 
 ```properties

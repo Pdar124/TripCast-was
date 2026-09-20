@@ -41,7 +41,11 @@ public class ClimateIndexService {
             throw new InvalidClimateIndexRangeException();
         }
 
-        List<ClimateIndexResponse> result = climateIndexRepository
+        if (!climateIndexRepository.existsByRegionId(regionId)) {
+            throw new RegionClimateIndexNotFoundException(regionId);
+        }
+
+        return climateIndexRepository
                 .findByRegionIdAndBaseDateBetweenOrderByBaseDateAsc(
                         regionId,
                         from,
@@ -50,11 +54,6 @@ public class ClimateIndexService {
                 .stream()
                 .map(ClimateIndexResponse::from)
                 .toList();
-
-        if (result.isEmpty()) {
-            throw new RegionClimateIndexNotFoundException(regionId);
-        }
-        return result;
     }
 
     private ClimateIndexResponse findLatest(String regionId) {
