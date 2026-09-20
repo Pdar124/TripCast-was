@@ -71,13 +71,11 @@ class FlywayMigrationTest {
 
     @Test
     void flyway_schema_history에_V1과_V2_성공_이력이_있다() {
-        Integer successCount = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM flyway_schema_history "
-                        + "WHERE version IN ('1', '2') AND success = TRUE",
-                Integer.class
-        );
+        List<MigrationInfo> applied = Arrays.asList(flyway.info().applied());
 
-        assertEquals(2, successCount);
+        assertEquals(2, applied.size());
+        assertTrue(applied.stream()
+                .allMatch(info -> info.getState() == MigrationState.SUCCESS));
     }
 
     @Test
