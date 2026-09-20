@@ -41,8 +41,8 @@ erDiagram
         bigint id PK
         varchar region_id "UK(region_id+base_date)"
         date base_date
-        int score
-        varchar grade
+        decimal score
+        varchar grade "API의 TCI_GRADE 원문"
     }
 
     SPOT_WEATHER_INDEX {
@@ -91,8 +91,8 @@ CREATE TABLE region_climate_index (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     region_id VARCHAR(20) NOT NULL,
     base_date DATE NOT NULL,
-    score INT NOT NULL,
-    grade VARCHAR(10) NOT NULL,
+    score DECIMAL(5, 2) NOT NULL,
+    grade VARCHAR(20) NOT NULL,
     CONSTRAINT uk_region_climate_date UNIQUE (region_id, base_date)
 );
 
@@ -179,8 +179,8 @@ CREATE TABLE spot_weather_index (
 | id | BIGINT | ● | | N | 내부 식별자 (Auto Increment) |
 | region_id | VARCHAR(20) | | | N | 시군구 코드 (`tour_course_stop.region_id`와 값으로 연결, FK 아님) |
 | base_date | DATE | | | N | 지수 기준일 |
-| score | INT | | | N | 관광기후지수 점수 |
-| grade | VARCHAR(10) | | | N | 지수 등급 (예: 매우좋음/좋음/보통/나쁨 — API 실제 응답값 확인 후 확정) |
+| score | DECIMAL(5, 2) | | | N | 관광기후지수 점수 (`kmaTci`, 예: `0.44`) |
+| grade | VARCHAR(20) | | | N | 공공데이터포털 응답의 `TCI_GRADE` 원문 |
 
 **인덱스/제약**
 - `uk_region_climate_date` UNIQUE(`region_id`, `base_date`) — 배치 재실행 시 upsert 보장, 하루 중복 적재 방지
@@ -194,7 +194,7 @@ CREATE TABLE spot_weather_index (
 
 **설명**: 관광지 단위 기상지수(체감온도, 자외선지수 등)를 일자별로 적재하는 시계열 캐시 테이블.
 **데이터 출처**: 기상청 "관광코스별 관광지 상세 날씨 조회서비스" OpenAPI (data.go.kr 15056912)
-**갱신 방식**: `region_climate_index`와 동일 배치에서 함께 처리
+**갱신 방식**: 현재 공개 API에 대응 필드가 없어 미적재. 향후 API 필드가 다시 제공될 때 같은 배치에서 처리
 
 | 컬럼명 | 타입 | PK | FK | NULL | 설명 |
 |---|---|---|---|---|---|
@@ -207,7 +207,7 @@ CREATE TABLE spot_weather_index (
 **인덱스/제약**
 - `uk_spot_weather_date` UNIQUE(`source_spot_id`, `base_date`)
 
-**비고**: 필드 목록(체감온도/자외선지수)은 잠정안. Phase 0 PoC로 실제 API 응답 확정 후 컬럼 추가/조정 필요.
+**비고**: 공공데이터포털 15056912의 현재 Swagger에는 관광지별 체감온도/자외선지수 기능이 공개되어 있지 않다. 엔티티와 테이블은 기존 설계 호환을 위해 유지하되 임의 계산값은 적재하지 않는다.
 
 ---
 

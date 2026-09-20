@@ -5,7 +5,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.tripcast.tourweather.climate.InvalidClimateIndexRangeException;
+import com.tripcast.tourweather.climate.RegionClimateIndexNotFoundException;
 import com.tripcast.tourweather.tourspot.TourSpotNotFoundException;
+import com.tripcast.tourweather.tourspot.course.TourCourseNotFoundException;
 
 import jakarta.validation.ConstraintViolationException;
 
@@ -30,6 +33,29 @@ public class GlobalExceptionHandler {
     ) {
         return new ErrorResponse(
                 HttpStatus.NOT_FOUND.value(),
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler({
+            TourCourseNotFoundException.class,
+            RegionClimateIndexNotFoundException.class
+    })
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleResourceNotFound(RuntimeException exception) {
+        return new ErrorResponse(
+                HttpStatus.NOT_FOUND.value(),
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(InvalidClimateIndexRangeException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleInvalidClimateRange(
+            InvalidClimateIndexRangeException exception
+    ) {
+        return new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
                 exception.getMessage()
         );
     }

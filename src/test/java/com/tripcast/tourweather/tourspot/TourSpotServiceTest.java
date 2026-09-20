@@ -2,6 +2,7 @@ package com.tripcast.tourweather.tourspot;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -23,6 +24,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import com.tripcast.tourweather.climate.ClimateIndexService;
+import com.tripcast.tourweather.tourspot.course.TourCourseStopRepository;
 import com.tripcast.tourweather.tourspot.dto.TourSpotResponse;
 import com.tripcast.tourweather.tourspot.dto.TourSpotWeatherResponse;
 import com.tripcast.tourweather.weather.WeatherService;
@@ -36,6 +39,12 @@ class TourSpotServiceTest {
 
     @Mock
     private WeatherService weatherService;
+
+    @Mock
+    private TourCourseStopRepository courseStopRepository;
+
+    @Mock
+    private ClimateIndexService climateIndexService;
 
     @InjectMocks
     private TourSpotService tourSpotService;
@@ -111,6 +120,8 @@ class TourSpotServiceTest {
                 .thenReturn(Optional.of(tourSpot));
         when(weatherService.getWeather(60, 127))
                 .thenReturn(weather);
+        when(courseStopRepository.findFirstByTourSpotIdOrderByIdAsc(1L))
+                .thenReturn(Optional.empty());
 
         TourSpotWeatherResponse result =
                 tourSpotService.getWeather(1L);
@@ -119,7 +130,8 @@ class TourSpotServiceTest {
                 () -> assertEquals("서울시청", result.tourSpotName()),
                 () -> assertEquals(37.5665, result.latitude()),
                 () -> assertEquals(126.9780, result.longitude()),
-                () -> assertEquals(weather, result.weather()));
+                () -> assertEquals(weather, result.weather()),
+                () -> assertNull(result.climateIndex()));
 
         verify(tourSpotRepository).findById(1L);
         verify(weatherService).getWeather(60, 127);

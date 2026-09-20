@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.tripcast.tourweather.climate.util.ClimateRegionIdNormalizer;
 import com.tripcast.tourweather.tourspot.TourSpot;
 import com.tripcast.tourweather.tourspot.TourSpotRepository;
 import com.tripcast.tourweather.tourspot.course.TourCourse;
@@ -91,7 +92,9 @@ public class TourSpotDataImporter
                             row.sourceSpotId(),
                             course,
                             tourSpot,
-                            row.regionId(),
+                            ClimateRegionIdNormalizer.normalize(
+                                    row.regionId()
+                            ),
                             row.courseOrder(),
                             row.travelTime(),
                             normalizeIndoorType(
