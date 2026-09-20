@@ -93,4 +93,44 @@ public class TourCourseStop {
         this.themeCode = themeCode;
         this.themeName = themeName;
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getSourceSpotId() {
+        return sourceSpotId;
+    }
+
+    public TourCourse getCourse() {
+        return course;
+    }
+
+    public TourSpot getTourSpot() {
+        return tourSpot;
+    }
+
+    public String getRegionId() {
+        return regionId;
+    }
+
+    public int getCourseOrder() {
+        return courseOrder;
+    }
+
+    public int getTravelTime() {
+        return travelTime;
+    }
+
+    public String getIndoorType() {
+        return indoorType;
+    }
+
+    public String getThemeCode() {
+        return themeCode;
+    }
+
+    public String getThemeName() {
+        return themeName;
+    }
 }
