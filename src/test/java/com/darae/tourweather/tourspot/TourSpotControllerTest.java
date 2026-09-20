@@ -59,7 +59,10 @@ class TourSpotControllerTest {
     void 음수_페이지는_400을_반환한다() throws Exception {
         mockMvc.perform(get("/api/tour-spots")
                         .param("page", "-1"))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message")
+                        .value("요청 값이 올바르지 않습니다."));
 
         verifyNoInteractions(tourSpotService);
     }
@@ -68,7 +71,10 @@ class TourSpotControllerTest {
     void 페이지_크기가_100을_넘으면_400을_반환한다() throws Exception {
         mockMvc.perform(get("/api/tour-spots")
                         .param("size", "101"))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message")
+                        .value("요청 값이 올바르지 않습니다."));
 
         verifyNoInteractions(tourSpotService);
     }
