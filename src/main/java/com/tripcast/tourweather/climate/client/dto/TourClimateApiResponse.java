@@ -3,6 +3,7 @@ package com.tripcast.tourweather.climate.client.dto;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -27,7 +28,12 @@ public record TourClimateApiResponse(Response response) {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record Items(List<Item> item) {
+    public record Items(
+            @JsonFormat(
+                    with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY
+            )
+            List<Item> item
+    ) {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
