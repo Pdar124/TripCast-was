@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.tripcast.tourweather.climate.dto.ClimateIndexResponse;
 import com.tripcast.tourweather.climate.repository.RegionClimateIndexRepository;
+import com.tripcast.tourweather.climate.util.ClimateRegionIdNormalizer;
 
 @Service
 @Transactional(readOnly = true)
@@ -22,12 +23,15 @@ public class ClimateIndexService {
     }
 
     public ClimateIndexResponse getLatest(String regionId) {
-        return findLatest(regionId);
+        return findLatest(ClimateRegionIdNormalizer.normalize(regionId));
     }
 
     public ClimateIndexResponse findLatestOrNull(String regionId) {
+        String normalizedRegionId = ClimateRegionIdNormalizer.normalize(
+                regionId
+        );
         return climateIndexRepository
-                .findFirstByRegionIdOrderByBaseDateDesc(regionId)
+                .findFirstByRegionIdOrderByBaseDateDesc(normalizedRegionId)
                 .map(ClimateIndexResponse::from)
                 .orElse(null);
     }
@@ -41,13 +45,16 @@ public class ClimateIndexService {
             throw new InvalidClimateIndexRangeException();
         }
 
-        if (!climateIndexRepository.existsByRegionId(regionId)) {
+        String normalizedRegionId = ClimateRegionIdNormalizer.normalize(
+                regionId
+        );
+        if (!climateIndexRepository.existsByRegionId(normalizedRegionId)) {
             throw new RegionClimateIndexNotFoundException(regionId);
         }
 
         return climateIndexRepository
                 .findByRegionIdAndBaseDateBetweenOrderByBaseDateAsc(
-                        regionId,
+                        normalizedRegionId,
                         from,
                         to
                 )

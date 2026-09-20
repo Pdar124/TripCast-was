@@ -47,7 +47,7 @@ class TourCourseServiceTest {
                 "1111000001",
                 course,
                 tourSpot,
-                "1111000000",
+                "1111051000",
                 1,
                 30,
                 "실외",
@@ -79,6 +79,10 @@ class TourCourseServiceTest {
                 () -> assertEquals(
                         climateIndex,
                         result.stops().get(0).climateIndex()
+                ),
+                () -> assertEquals(
+                        "1111000000",
+                        result.stops().get(0).spot().regionId()
                 ),
                 () -> assertNull(result.stops().get(0).weather())
         );

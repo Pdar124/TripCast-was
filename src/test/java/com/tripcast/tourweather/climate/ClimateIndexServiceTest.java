@@ -28,18 +28,18 @@ class ClimateIndexServiceTest {
     void 지역은_있지만_기간_데이터가_없으면_빈_목록을_반환한다() {
         LocalDate from = LocalDate.of(2026, 9, 1);
         LocalDate to = LocalDate.of(2026, 9, 2);
-        when(climateIndexRepository.existsByRegionId("1111000000"))
+        when(climateIndexRepository.existsByRegionId("4822000000"))
                 .thenReturn(true);
         when(climateIndexRepository
                 .findByRegionIdAndBaseDateBetweenOrderByBaseDateAsc(
-                        "1111000000",
+                        "4822000000",
                         from,
                         to
                 ))
                 .thenReturn(List.of());
 
         List<ClimateIndexResponse> result = climateIndexService.getRange(
-                "1111000000",
+                "4822051000",
                 from,
                 to
         );
