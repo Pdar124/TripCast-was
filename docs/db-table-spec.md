@@ -9,7 +9,7 @@
 erDiagram
     TOUR_COURSE ||--o{ TOUR_COURSE_STOP : "코스에 속한 정류지"
     TOUR_SPOT ||--o{ TOUR_COURSE_STOP : "관광지가 등장하는 지점"
-    TOUR_COURSE_STOP }o..|| REGION_CLIMATE_INDEX : "region_id로 논리 연결 (FK 아님)"
+    TOUR_COURSE_STOP }o..|| REGION_CLIMATE_INDEX : "region_id 정규화 후 논리 연결 (FK 아님)"
     TOUR_COURSE_STOP }o..|| SPOT_WEATHER_INDEX : "source_spot_id로 논리 연결 (FK 아님)"
 
     TOUR_SPOT {
@@ -177,7 +177,7 @@ CREATE TABLE spot_weather_index (
 | 컬럼명 | 타입 | PK | FK | NULL | 설명 |
 |---|---|---|---|---|---|
 | id | BIGINT | ● | | N | 내부 식별자 (Auto Increment) |
-| region_id | VARCHAR(20) | | | N | 시군구 코드 (`tour_course_stop.region_id`와 값으로 연결, FK 아님) |
+| region_id | VARCHAR(20) | | | N | 시군구 코드. `tour_course_stop.region_id`를 `ClimateRegionIdNormalizer`로 정규화(앞 5자리 + `00000`)한 값과 연결, FK 아님 |
 | base_date | DATE | | | N | 지수 기준일 |
 | score | DECIMAL(5, 2) | | | N | 관광기후지수 점수 (`kmaTci`, 예: `0.44`) |
 | grade | VARCHAR(20) | | | N | 공공데이터포털 응답의 `TCI_GRADE` 원문 |
@@ -186,7 +186,7 @@ CREATE TABLE spot_weather_index (
 - `uk_region_climate_date` UNIQUE(`region_id`, `base_date`) — 배치 재실행 시 upsert 보장, 하루 중복 적재 방지
 - `region_id`, `base_date` 복합 조회 인덱스 권장 (조회 API의 핵심 WHERE 조건)
 
-**비고**: `tour_course_stop`과 물리적 FK 없음. 시계열 데이터 특성상 조회 시점에 `region_id + base_date`로 논리 조인.
+**비고**: `tour_course_stop`과 물리적 FK 없음. `tour_course_stop.region_id`는 CSV 원본상 읍·면·동 단위 코드를 포함할 수 있어, 조회 시점에 `ClimateRegionIdNormalizer.normalize()`로 시군구 단위(앞 5자리 + `00000`)로 정규화한 뒤 `region_id + base_date`로 논리 조인한다. 정규화 예시 및 API 연동 상세는 [docs/tour-climate-api.md](./tour-climate-api.md) 참고.
 
 ---
 
@@ -217,5 +217,5 @@ CREATE TABLE spot_weather_index (
 |---|---|---|
 | tour_course 1 : N tour_course_stop | 식별관계 | FK (`fk_course_stop_course`) |
 | tour_spot 1 : N tour_course_stop | 식별관계 | FK (`fk_course_stop_spot`) |
-| tour_course_stop N : 1 region_climate_index | 논리관계 | `region_id` 값 매칭 (FK 없음) |
+| tour_course_stop N : 1 region_climate_index | 논리관계 | `region_id` 정규화 후 값 매칭 (FK 없음) |
 | tour_course_stop N : 1 spot_weather_index | 논리관계 | `source_spot_id` 값 매칭 (FK 없음) |
