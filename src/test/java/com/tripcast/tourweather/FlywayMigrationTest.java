@@ -28,8 +28,7 @@ class FlywayMigrationTest {
             "tour_spot",
             "tour_course",
             "tour_course_stop",
-            "region_climate_index",
-            "spot_weather_index"
+            "region_climate_index"
     );
 
     @Autowired
@@ -42,7 +41,7 @@ class FlywayMigrationTest {
     private RegionClimateIndexRepository regionClimateIndexRepository;
 
     @Test
-    void V1과_V2가_실패없이_모두_적용된다() {
+    void V1부터_V3까지_실패없이_모두_적용된다() {
         MigrationInfo[] all = flyway.info().all();
 
         assertTrue(Arrays.stream(all)
@@ -52,12 +51,12 @@ class FlywayMigrationTest {
                 .map(info -> info.getVersion().getVersion())
                 .toList();
 
-        assertEquals(List.of("1", "2"), appliedVersions);
-        assertEquals("2", flyway.info().current().getVersion().getVersion());
+        assertEquals(List.of("1", "2", "3"), appliedVersions);
+        assertEquals("3", flyway.info().current().getVersion().getVersion());
     }
 
     @Test
-    void 다섯_테이블이_모두_생성된다() {
+    void 네_테이블이_모두_생성된다() {
         for (String table : MANAGED_TABLES) {
             Integer count = jdbcTemplate.queryForObject(
                     "SELECT COUNT(*) FROM information_schema.tables "
@@ -70,10 +69,21 @@ class FlywayMigrationTest {
     }
 
     @Test
-    void flyway_schema_history에_V1과_V2_성공_이력이_있다() {
+    void spot_weather_index는_V3에서_삭제되어_존재하지_않는다() {
+        Integer count = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM information_schema.tables "
+                        + "WHERE LOWER(table_name) = LOWER('spot_weather_index')",
+                Integer.class
+        );
+
+        assertEquals(0, count);
+    }
+
+    @Test
+    void flyway_schema_history에_V1부터_V3까지_성공_이력이_있다() {
         List<MigrationInfo> applied = Arrays.asList(flyway.info().applied());
 
-        assertEquals(2, applied.size());
+        assertEquals(3, applied.size());
         assertTrue(applied.stream()
                 .allMatch(info -> info.getState() == MigrationState.SUCCESS));
     }
