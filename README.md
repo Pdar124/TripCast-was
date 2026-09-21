@@ -5,6 +5,7 @@
 - API 전체 목록/테스트: 앱 실행 후 `/swagger-ui.html`
 - DB 테이블 명세: [docs/db-table-spec.md](docs/db-table-spec.md)
 - 관광기후지수 연동(외부 API, 배치, 환경변수) 가이드: [docs/tour-climate-api.md](docs/tour-climate-api.md)
+- DB 스키마 관리(Flyway 마이그레이션, 기존 DB 편입) 가이드: [docs/flyway-migration.md](docs/flyway-migration.md)
 
 ## 커밋 컨벤션
 
