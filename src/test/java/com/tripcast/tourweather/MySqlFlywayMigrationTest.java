@@ -38,9 +38,21 @@ class MySqlFlywayMigrationTest {
     private RegionClimateIndexRepository regionClimateIndexRepository;
 
     @Test
-    void 빈_MySQL에서_V1과_V2가_모두_성공한다() {
-        assertEquals("2", flyway.info().current().getVersion().getVersion());
-        assertEquals(2, flyway.info().applied().length);
+    void 빈_MySQL에서_V1부터_V3까지_모두_성공한다() {
+        assertEquals("3", flyway.info().current().getVersion().getVersion());
+        assertEquals(3, flyway.info().applied().length);
+    }
+
+    @Test
+    void spot_weather_index는_V3에서_삭제되어_존재하지_않는다() {
+        Integer count = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM information_schema.tables "
+                        + "WHERE table_schema = DATABASE() "
+                        + "AND table_name = 'spot_weather_index'",
+                Integer.class
+        );
+
+        assertEquals(0, count);
     }
 
     @Test

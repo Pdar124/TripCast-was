@@ -1,7 +1,9 @@
 # 테이블 명세서 — TripCast 관광코스 날씨/관광기후지수 서비스
 
 `tour_spot`, `tour_course`, `tour_course_stop`은 기존 구현된 테이블이고,
-`region_climate_index`, `spot_weather_index`는 관광기후지수 연동을 위해 신규 설계된 테이블이다.
+`region_climate_index`는 관광기후지수 연동을 위해 신규 설계된 테이블이다.
+
+`spot_weather_index`(관광지별 체감온도·자외선지수)는 한때 스키마에 있었지만, 대응하는 공공API 필드가 공개되지 않아 실제로 배치가 채운 적이 없다. Flyway `V3__drop_spot_weather_index.sql`로 삭제했다.
 
 ## ERD
 
@@ -10,7 +12,6 @@ erDiagram
     TOUR_COURSE ||--o{ TOUR_COURSE_STOP : "코스에 속한 정류지"
     TOUR_SPOT ||--o{ TOUR_COURSE_STOP : "관광지가 등장하는 지점"
     TOUR_COURSE_STOP }o..|| REGION_CLIMATE_INDEX : "region_id 정규화 후 논리 연결 (FK 아님)"
-    TOUR_COURSE_STOP }o..|| SPOT_WEATHER_INDEX : "source_spot_id로 논리 연결 (FK 아님)"
 
     TOUR_SPOT {
         bigint id PK
@@ -43,14 +44,6 @@ erDiagram
         date base_date
         decimal score
         varchar grade "API의 TCI_GRADE 원문"
-    }
-
-    SPOT_WEATHER_INDEX {
-        bigint id PK
-        varchar source_spot_id "UK(source_spot_id+base_date)"
-        date base_date
-        double feels_like_temp
-        int uv_index
     }
 ```
 
@@ -94,15 +87,6 @@ CREATE TABLE region_climate_index (
     score DECIMAL(5, 2) NOT NULL,
     grade VARCHAR(20) NOT NULL,
     CONSTRAINT uk_region_climate_date UNIQUE (region_id, base_date)
-);
-
-CREATE TABLE spot_weather_index (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    source_spot_id VARCHAR(20) NOT NULL,
-    base_date DATE NOT NULL,
-    feels_like_temp DOUBLE,
-    uv_index INT,
-    CONSTRAINT uk_spot_weather_date UNIQUE (source_spot_id, base_date)
 );
 ```
 
@@ -190,27 +174,6 @@ CREATE TABLE spot_weather_index (
 
 ---
 
-### 5. spot_weather_index (관광지 기상지수) — 신규
-
-**설명**: 관광지 단위 기상지수(체감온도, 자외선지수 등)를 일자별로 적재하는 시계열 캐시 테이블.
-**데이터 출처**: 기상청 "관광코스별 관광지 상세 날씨 조회서비스" OpenAPI (data.go.kr 15056912)
-**갱신 방식**: 현재 공개 API에 대응 필드가 없어 미적재. 향후 API 필드가 다시 제공될 때 같은 배치에서 처리
-
-| 컬럼명 | 타입 | PK | FK | NULL | 설명 |
-|---|---|---|---|---|---|
-| id | BIGINT | ● | | N | 내부 식별자 (Auto Increment) |
-| source_spot_id | VARCHAR(20) | | | N | 원본 지점번호 (`tour_course_stop.source_spot_id`와 값으로 연결, FK 아님) |
-| base_date | DATE | | | N | 지수 기준일 |
-| feels_like_temp | DOUBLE | | | Y | 체감온도 |
-| uv_index | INT | | | Y | 자외선지수 |
-
-**인덱스/제약**
-- `uk_spot_weather_date` UNIQUE(`source_spot_id`, `base_date`)
-
-**비고**: 공공데이터포털 15056912의 현재 Swagger에는 관광지별 체감온도/자외선지수 기능이 공개되어 있지 않다. 엔티티와 테이블은 기존 설계 호환을 위해 유지하되 임의 계산값은 적재하지 않는다.
-
----
-
 ## 테이블 간 관계 요약
 
 | 관계 | 유형 | 방식 |
@@ -218,4 +181,3 @@ CREATE TABLE spot_weather_index (
 | tour_course 1 : N tour_course_stop | 식별관계 | FK (`fk_course_stop_course`) |
 | tour_spot 1 : N tour_course_stop | 식별관계 | FK (`fk_course_stop_spot`) |
 | tour_course_stop N : 1 region_climate_index | 논리관계 | `region_id` 정규화 후 값 매칭 (FK 없음) |
-| tour_course_stop N : 1 spot_weather_index | 논리관계 | `source_spot_id` 값 매칭 (FK 없음) |

@@ -6,8 +6,8 @@ TripCast는 `spring.jpa.hibernate.ddl-auto=update`로 스키마를 자동 관리
 
 | 상황 | 동작 |
 |---|---|
-| 완전히 빈 DB(새 개발 환경, CI, Testcontainers) | `V1__create_initial_schema.sql`로 다섯 테이블을 생성하고, 이어서 `V2__change_climate_score_to_decimal.sql`이 `score`를 `DECIMAL(5,2)`로 변경한다. |
-| 이미 Hibernate `ddl-auto=update`로 테이블이 만들어진 기존 로컬 DB | Flyway가 관리 이력을 모르는 상태이므로, `baseline` 처리를 먼저 해서 "이미 V1 상태까지는 완료된 것"으로 등록한 뒤 V2부터 적용한다. |
+| 완전히 빈 DB(새 개발 환경, CI, Testcontainers) | `V1__create_initial_schema.sql`로 다섯 테이블을 생성하고, `V2__change_climate_score_to_decimal.sql`이 `score`를 `DECIMAL(5,2)`로 변경하고, `V3__drop_spot_weather_index.sql`이 미사용 테이블 `spot_weather_index`를 삭제한다. 최종적으로 네 테이블이 남는다. |
+| 이미 Hibernate `ddl-auto=update`로 테이블이 만들어진 기존 로컬 DB | Flyway가 관리 이력을 모르는 상태이므로, `baseline` 처리를 먼저 해서 "이미 V1 상태까지는 완료된 것"으로 등록한 뒤 V2, V3가 순서대로 적용된다. |
 
 기존 DB를 처음 Flyway 관리 대상으로 편입할 때만 아래 baseline 절차가 필요하고, 이후로는 새 DB와 동일하게 동작한다.
 
@@ -32,6 +32,8 @@ SHOW CREATE TABLE tour_course_stop;
 SHOW CREATE TABLE region_climate_index;
 SHOW CREATE TABLE spot_weather_index;
 ```
+
+`spot_weather_index`도 확인 대상에 포함되는 이유는, baseline이 "V1까지 이미 끝났다"고 가정하는 것이고 V1은 이 테이블을 만드는 내용이기 때문이다. baseline 직후 `V3`가 자동으로 이 테이블을 삭제하므로 최종 상태에는 남지 않는다.
 
 특히 `region_climate_index`의 `score` 타입을 확인한다.
 
@@ -61,7 +63,8 @@ $env:SPRING_FLYWAY_BASELINE_VERSION="1"
 
 - 기존 DB가 "버전 1까지 이미 적용됨"으로 `flyway_schema_history`에 등록됨
 - 이어서 `V2`가 실행되어 `score`가 `DECIMAL(5,2)`로 변경됨
-- 기존 관광지·코스·지수 데이터는 그대로 보존됨 (Flyway는 `ALTER`만 수행, 테이블 재생성 없음)
+- `V3`가 실행되어 미사용 테이블 `spot_weather_index`가 삭제됨
+- 기존 관광지·코스·지수 데이터는 그대로 보존됨 (Flyway는 `ALTER`/`DROP`만 수행, 나머지 테이블 재생성 없음)
 - Hibernate `ddl-auto=validate`가 통과함
 
 ## 4. 일회성 설정 제거
@@ -83,7 +86,7 @@ FROM flyway_schema_history
 ORDER BY installed_rank;
 ```
 
-`version 1`, `version 2` 모두 `success = 1`이어야 한다.
+`version 1`, `version 2`, `version 3` 모두 `success = 1`이어야 한다.
 
 ```sql
 SELECT DATA_TYPE, NUMERIC_PRECISION, NUMERIC_SCALE
@@ -91,13 +94,15 @@ FROM information_schema.columns
 WHERE table_schema = DATABASE()
   AND table_name = 'region_climate_index'
   AND column_name = 'score';
+
+SHOW TABLES LIKE 'spot_weather_index';
 ```
 
-`decimal(5,2)`가 나와야 한다.
+첫 번째 쿼리는 `decimal(5,2)`가 나와야 하고, 두 번째 쿼리는 결과가 없어야 한다(V3로 삭제됐으므로).
 
 ## 이후 스키마를 바꿀 때 지킬 규칙
 
-- **이미 적용된 마이그레이션 파일(`V1`, `V2`)은 절대 수정하지 않는다.** Flyway는 체크섬으로 검증하므로, 이미 실행된 파일을 고치면 다음 배포에서 검증 실패로 앱이 기동되지 않는다.
-- 스키마를 더 바꿔야 하면 `V3__...`처럼 새 버전 파일을 추가한다.
+- **이미 적용된 마이그레이션 파일(`V1`, `V2`, `V3`)은 절대 수정하지 않는다.** Flyway는 체크섬으로 검증하므로, 이미 실행된 파일을 고치면 다음 배포에서 검증 실패로 앱이 기동되지 않는다.
+- 스키마를 더 바꿔야 하면 `V4__...`처럼 새 버전 파일을 추가한다.
 - Flyway Community Edition에는 자동 undo(rollback) 기능이 없다. 되돌려야 할 상황이 생기면 새 마이그레이션으로 원상복구하거나, 1단계에서 만든 백업으로 복원한다.
 - `spring.flyway.clean-disabled=true`는 항상 유지한다 — `flyway clean`은 전체 스키마를 삭제하는 명령이라 운영 환경에서 절대 실행하면 안 된다.
