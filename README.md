@@ -1,5 +1,17 @@
 # tour-weather
 
+## 로컬 실행 환경변수
+
+`DB_PASSWORD`, `WEATHER_API_KEY`, `TOUR_CLIMATE_API_KEY`를 매번 손으로 치기 귀찮다면:
+
+```powershell
+Copy-Item .env.example .env
+# .env를 열어서 실제 값 채우기 (이 파일은 git에 올라가지 않음)
+. .\load-env.ps1
+```
+
+새 터미널을 열 때마다 `. .\load-env.ps1`만 다시 실행하면 된다.
+
 ## 문서
 
 - API 전체 목록/테스트: 앱 실행 후 `/swagger-ui.html`
