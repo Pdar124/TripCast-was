@@ -22,7 +22,7 @@
 | 테스트 | ![JUnit5](https://img.shields.io/badge/JUnit5-25A162?style=flat-square&logo=junit5&logoColor=white) ![Testcontainers](https://img.shields.io/badge/Testcontainers-0EA5E9?style=flat-square) ![Mockito](https://img.shields.io/badge/Mockito-78A641?style=flat-square) |
 | 빌드/배포 | ![Gradle](https://img.shields.io/badge/Gradle-02303A?style=flat-square&logo=gradle&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white) ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white) |
 
-## 시작하기
+## 실행 방법
 
 ### 사전 준비
 
@@ -99,7 +99,7 @@ src/main/java/com/tripcast/tourweather/
 
 ## ERD
 
-![TripCast ERD](docs/images/erd.png)
+<img width="100%" alt="ERD" src="https://github.com/user-attachments/assets/ff113130-4cac-4d06-ac2c-acc5d57fa14c" />
 
 컬럼별 상세 설명과 DDL은 [docs/db-table-spec.md](docs/db-table-spec.md) 참고.
 
