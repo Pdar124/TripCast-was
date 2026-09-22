@@ -1,4 +1,4 @@
-# TripCast (tour-weather)
+# TripCast
 
 관광지를 검색하고, 관광코스 단위로 날씨와 관광기후지수를 통합 조회하는 백엔드 API입니다.
 
