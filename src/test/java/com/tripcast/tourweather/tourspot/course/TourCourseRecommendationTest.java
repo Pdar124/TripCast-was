@@ -1,0 +1,144 @@
+package com.tripcast.tourweather.tourspot.course;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import com.tripcast.tourweather.climate.ClimateIndexService;
+import com.tripcast.tourweather.climate.dto.ClimateIndexResponse;
+import com.tripcast.tourweather.tourspot.TourSpot;
+import com.tripcast.tourweather.tourspot.course.dto.CourseRecommendationResponse;
+import com.tripcast.tourweather.weather.WeatherService;
+
+@ExtendWith(MockitoExtension.class)
+class TourCourseRecommendationTest {
+
+    @Mock
+    private TourCourseRepository courseRepository;
+
+    @Mock
+    private TourCourseStopRepository courseStopRepository;
+
+    @Mock
+    private ClimateIndexService climateIndexService;
+
+    @Mock
+    private WeatherService weatherService;
+
+    @InjectMocks
+    private TourCourseService tourCourseService;
+
+    @Test
+    void 관광기후지수가_높은_코스부터_정렬해서_반환하고_지수가_없는_코스는_제외한다() {
+        TourSpot spot = new TourSpot("테스트 관광지", 37.0, 127.0);
+
+        TourCourse lowScoreCourse = course(1L, "TH01");
+        TourCourse highScoreCourse = course(2L, "TH02");
+        TourCourse noDataCourse = course(3L, "TH03");
+
+        when(courseRepository.findAll()).thenReturn(List.of(
+                lowScoreCourse,
+                highScoreCourse,
+                noDataCourse
+        ));
+
+        when(courseStopRepository.findFirstByCourseIdOrderByCourseOrderAsc(1L))
+                .thenReturn(Optional.of(
+                        stop(lowScoreCourse, spot, "1111051000")
+                ));
+        when(courseStopRepository.findFirstByCourseIdOrderByCourseOrderAsc(2L))
+                .thenReturn(Optional.of(
+                        stop(highScoreCourse, spot, "2611051000")
+                ));
+        when(courseStopRepository.findFirstByCourseIdOrderByCourseOrderAsc(3L))
+                .thenReturn(Optional.of(
+                        stop(noDataCourse, spot, "9999051000")
+                ));
+
+        when(climateIndexService.findLatestOrNull("1111051000"))
+                .thenReturn(climateIndex("1111000000", "0.30", "보통"));
+        when(climateIndexService.findLatestOrNull("2611051000"))
+                .thenReturn(climateIndex("2611000000", "0.90", "매우좋음"));
+        when(climateIndexService.findLatestOrNull("9999051000"))
+                .thenReturn(null);
+
+        List<CourseRecommendationResponse> result =
+                tourCourseService.getRecommendations(10);
+
+        assertEquals(2, result.size());
+        assertEquals(2L, result.get(0).courseId());
+        assertEquals(1L, result.get(1).courseId());
+    }
+
+    @Test
+    void limit_개수만큼만_반환한다() {
+        TourSpot spot = new TourSpot("테스트 관광지", 37.0, 127.0);
+        TourCourse first = course(1L, "TH01");
+        TourCourse second = course(2L, "TH02");
+
+        when(courseRepository.findAll())
+                .thenReturn(List.of(first, second));
+        when(courseStopRepository.findFirstByCourseIdOrderByCourseOrderAsc(1L))
+                .thenReturn(Optional.of(stop(first, spot, "1111051000")));
+        when(courseStopRepository.findFirstByCourseIdOrderByCourseOrderAsc(2L))
+                .thenReturn(Optional.of(stop(second, spot, "2611051000")));
+        when(climateIndexService.findLatestOrNull("1111051000"))
+                .thenReturn(climateIndex("1111000000", "0.30", "보통"));
+        when(climateIndexService.findLatestOrNull("2611051000"))
+                .thenReturn(climateIndex("2611000000", "0.90", "매우좋음"));
+
+        List<CourseRecommendationResponse> result =
+                tourCourseService.getRecommendations(1);
+
+        assertEquals(1, result.size());
+        assertEquals(2L, result.get(0).courseId());
+    }
+
+    private TourCourse course(Long id, String sourceCourseId) {
+        TourCourse course = new TourCourse(sourceCourseId);
+        ReflectionTestUtils.setField(course, "id", id);
+        return course;
+    }
+
+    private TourCourseStop stop(
+            TourCourse course,
+            TourSpot spot,
+            String regionId
+    ) {
+        return new TourCourseStop(
+                "SPOT-" + regionId,
+                course,
+                spot,
+                regionId,
+                1,
+                10,
+                "실외",
+                "01",
+                "역사"
+        );
+    }
+
+    private ClimateIndexResponse climateIndex(
+            String regionId,
+            String score,
+            String grade
+    ) {
+        return new ClimateIndexResponse(
+                regionId,
+                LocalDate.of(2026, 9, 23),
+                new BigDecimal(score),
+                grade
+        );
+    }
+}
