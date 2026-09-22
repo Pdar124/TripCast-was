@@ -49,6 +49,7 @@ API 활용신청 승인과 키가 준비된 환경에서 다음 테스트를 실
 | --- | --- | --- |
 | GET | `/api/regions/{regionId}/climate-index` | 지역의 최근 관광기후지수 |
 | GET | `/api/regions/{regionId}/climate-index/range?from=YYYY-MM-DD&to=YYYY-MM-DD` | 기간 내 저장된 지수 |
+| GET | `/api/tour-courses?page=0&size=20` | 관광코스 목록(페이지네이션). 코스에는 별도 이름이 없어 첫 관광지명/테마/정류지 수를 요약 정보로 반환 |
 | GET | `/api/tour-courses/{courseId}` | 코스와 관광지 목록 |
 | GET | `/api/tour-courses/{courseId}/weather` | 관광지별 동네예보와 지역 지수 |
 | GET | `/api/tour-courses/recommendations?limit=10` | 관광기후지수가 높은 순으로 코스 추천 |
