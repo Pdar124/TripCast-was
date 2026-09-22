@@ -2,6 +2,7 @@ package com.tripcast.tourweather.tourspot.course;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tripcast.tourweather.tourspot.course.dto.CourseRecommendationResponse;
 import com.tripcast.tourweather.tourspot.course.dto.TourCourseResponse;
+import com.tripcast.tourweather.tourspot.course.dto.TourCourseSummaryResponse;
 import com.tripcast.tourweather.tourspot.course.dto.TourCourseWeatherResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,6 +33,24 @@ public class TourCourseController {
 
     public TourCourseController(TourCourseService tourCourseService) {
         this.tourCourseService = tourCourseService;
+    }
+
+    @Operation(
+            summary = "관광코스 목록 조회",
+            description = "관광코스를 페이지 단위로 조회합니다. 코스에는 별도 이름이 없어, 각 코스의 첫 관광지명과 테마, 정류지 수를 요약 정보로 함께 반환합니다."
+    )
+    @GetMapping
+    public Page<TourCourseSummaryResponse> searchCourses(
+            @RequestParam(defaultValue = "0")
+            @Min(0)
+            int page,
+
+            @RequestParam(defaultValue = "20")
+            @Min(1)
+            @Max(100)
+            int size
+    ) {
+        return tourCourseService.searchCourses(page, size);
     }
 
     @Operation(
