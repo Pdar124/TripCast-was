@@ -13,7 +13,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest(properties = {
         "springdoc.api-docs.enabled=true",
-        "springdoc.swagger-ui.enabled=true"
+        "springdoc.swagger-ui.enabled=true",
+        "app.climate-index-sync.enabled=true"
 })
 @AutoConfigureMockMvc
 class OpenApiContractTest {
@@ -44,6 +45,18 @@ class OpenApiContractTest {
                 ).exists())
                 .andExpect(jsonPath(
                         "$.paths['/api/tour-courses/{courseId}/weather']"
+                ).exists());
+    }
+
+    @Test
+    void 인증_및_관리자_API가_OpenAPI에_노출된다() throws Exception {
+        mockMvc.perform(get("/v3/api-docs"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(
+                        "$.paths['/api/auth/login']"
+                ).exists())
+                .andExpect(jsonPath(
+                        "$.paths['/api/admin/climate-index/sync']"
                 ).exists());
     }
 }
