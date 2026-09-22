@@ -51,5 +51,8 @@ API 활용신청 승인과 키가 준비된 환경에서 다음 테스트를 실
 | GET | `/api/regions/{regionId}/climate-index/range?from=YYYY-MM-DD&to=YYYY-MM-DD` | 기간 내 저장된 지수 |
 | GET | `/api/tour-courses/{courseId}` | 코스와 관광지 목록 |
 | GET | `/api/tour-courses/{courseId}/weather` | 관광지별 동네예보와 지역 지수 |
+| GET | `/api/tour-courses/recommendations?limit=10` | 관광기후지수가 높은 순으로 코스 추천 |
 
 기간 조회는 DB에 데이터가 있는 날짜만 반환한다. 코스 통합 조회 중 한 관광지의 동네예보 호출이 실패하면 해당 관광지의 `weather`만 `null`이 되고 나머지 코스 정보와 관광기후지수는 반환된다.
+
+코스 추천은 각 코스의 **첫 번째 관광지가 속한 지역**의 관광기후지수만 기준으로 삼는다(코스 전체 경로의 평균이 아님). 그 지역에 저장된 지수가 없는 코스는 추천 목록에서 제외된다.
