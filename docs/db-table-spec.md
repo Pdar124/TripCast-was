@@ -9,9 +9,9 @@
 
 ```mermaid
 erDiagram
-    TOUR_COURSE["관광 코스 (tour_course)"] ||--o{ TOUR_COURSE_STOP["관광 코스 지점 (tour_course_stop)"] : "코스에 속한 정류지"
-    TOUR_SPOT["관광지 (tour_spot)"] ||--o{ TOUR_COURSE_STOP : "관광지가 등장하는 지점"
-    TOUR_COURSE_STOP }o..|| REGION_CLIMATE_INDEX["지역 관광 기후지수 (region_climate_index)"] : "region_id 정규화 후 논리 연결 (FK 아님)"
+    TOUR_COURSE ||--o{ TOUR_COURSE_STOP : "코스에 속한 정류지"
+    TOUR_SPOT ||--o{ TOUR_COURSE_STOP : "관광지가 등장하는 지점"
+    TOUR_COURSE_STOP }o..|| REGION_CLIMATE_INDEX : "region_id 정규화 후 논리 연결 (FK 아님)"
 
     TOUR_SPOT {
         bigint id PK "관광지 ID"
