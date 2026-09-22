@@ -173,10 +173,10 @@ erDiagram
 | 브랜치 | 설명 |
 | --- | --- |
 | main | 배포 가능한 안정 버전 |
-| develop | 다음 배포를 위한 개발 브랜치 |
 | feature | 기능 개발 브랜치 |
-| fix | 버그 수정 브랜치 |
-| hotfix | 배포 후 긴급 수정 브랜치 |
-| release | 배포 준비 브랜치 |
+| refactor | 코드 리팩토링 브랜치 |
+| test | 테스트 코드 추가/보강 브랜치 |
+| chore | 빌드 설정, 의존성 등 기타 변경 브랜치 |
+| ci | CI/CD 설정 변경 브랜치 |
 
-예시: `feature/weather-api`
+예시: `feature/admin-auth`, `chore/add-dockerfile`, `refactor/remove-spot-weather-index`
