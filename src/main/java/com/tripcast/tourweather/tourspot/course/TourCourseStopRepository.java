@@ -13,6 +13,10 @@ public interface TourCourseStopRepository
 
     List<TourCourseStop> findByCourseIdOrderByCourseOrderAsc(Long courseId);
 
+    Optional<TourCourseStop> findFirstByCourseIdOrderByCourseOrderAsc(
+            Long courseId
+    );
+
     Optional<TourCourseStop> findFirstByTourSpotIdOrderByIdAsc(Long tourSpotId);
 
     @Query("""

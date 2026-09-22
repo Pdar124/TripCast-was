@@ -5,6 +5,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,8 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.tripcast.tourweather.climate.dto.ClimateIndexResponse;
+import com.tripcast.tourweather.tourspot.course.dto.CourseRecommendationResponse;
 import com.tripcast.tourweather.tourspot.course.dto.TourCourseResponse;
 import com.tripcast.tourweather.tourspot.course.dto.TourCourseStopResponse;
 import com.tripcast.tourweather.tourspot.course.dto.TourCourseStopWeatherResponse;
@@ -106,5 +110,37 @@ class TourCourseControllerTest {
                 .andExpect(jsonPath("$.stops[0].spot.tourSpotName")
                         .value("서울시청"))
                 .andExpect(jsonPath("$.stops[0].weather").isEmpty());
+    }
+
+    @Test
+    void 코스_추천_목록을_조회한다() throws Exception {
+        when(tourCourseService.getRecommendations(10))
+                .thenReturn(List.of(new CourseRecommendationResponse(
+                        2L,
+                        "TH02",
+                        new ClimateIndexResponse(
+                                "2611000000",
+                                LocalDate.of(2026, 9, 23),
+                                new BigDecimal("0.90"),
+                                "매우좋음"
+                        )
+                )));
+
+        mockMvc.perform(get("/api/tour-courses/recommendations"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].courseId").value(2))
+                .andExpect(jsonPath("$[0].climateIndex.grade")
+                        .value("매우좋음"));
+    }
+
+    @Test
+    void limit이_범위를_벗어나면_400을_반환한다() throws Exception {
+        mockMvc.perform(get("/api/tour-courses/recommendations")
+                        .param("limit", "0"))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(get("/api/tour-courses/recommendations")
+                        .param("limit", "51"))
+                .andExpect(status().isBadRequest());
     }
 }
