@@ -1,0 +1,17 @@
+.git
+.gradle
+build
+out
+.idea
+*.iml
+.vscode
+.claude
+
+.env
+.env.example
+TripCast_backup_*.sql
+*.log
+
+docs
+README.md
+.github
