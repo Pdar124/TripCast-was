@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.tripcast.tourweather.auth.InvalidCredentialsException;
 import com.tripcast.tourweather.climate.InvalidClimateIndexRangeException;
 import com.tripcast.tourweather.climate.RegionClimateIndexNotFoundException;
 import com.tripcast.tourweather.tourspot.TourSpotNotFoundException;
@@ -56,6 +57,17 @@ public class GlobalExceptionHandler {
     ) {
         return new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleInvalidCredentials(
+            InvalidCredentialsException exception
+    ) {
+        return new ErrorResponse(
+                HttpStatus.UNAUTHORIZED.value(),
                 exception.getMessage()
         );
     }
