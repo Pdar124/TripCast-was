@@ -1,20 +1,28 @@
 package com.tripcast.tourweather.tourspot.course;
 
+import java.util.List;
+
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.tripcast.tourweather.tourspot.course.dto.CourseRecommendationResponse;
 import com.tripcast.tourweather.tourspot.course.dto.TourCourseResponse;
 import com.tripcast.tourweather.tourspot.course.dto.TourCourseWeatherResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 
 @Tag(
         name = "관광코스",
         description = "관광코스 상세 및 통합 날씨 조회 API"
 )
+@Validated
 @RestController
 @RequestMapping("/api/tour-courses")
 public class TourCourseController {
@@ -23,6 +31,20 @@ public class TourCourseController {
 
     public TourCourseController(TourCourseService tourCourseService) {
         this.tourCourseService = tourCourseService;
+    }
+
+    @Operation(
+            summary = "오늘 가기 좋은 코스 추천",
+            description = "코스 첫 관광지가 속한 지역의 관광기후지수가 높은 순으로 정렬해 반환합니다. 지수 데이터가 없는 코스는 제외됩니다."
+    )
+    @GetMapping("/recommendations")
+    public List<CourseRecommendationResponse> getRecommendations(
+            @RequestParam(defaultValue = "10")
+            @Min(1)
+            @Max(50)
+            int limit
+    ) {
+        return tourCourseService.getRecommendations(limit);
     }
 
     @Operation(

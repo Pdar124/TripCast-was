@@ -1,8 +1,10 @@
 package com.tripcast.tourweather.tourspot.course;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -14,6 +16,7 @@ import com.tripcast.tourweather.climate.ClimateIndexService;
 import com.tripcast.tourweather.climate.dto.ClimateIndexResponse;
 import com.tripcast.tourweather.climate.util.ClimateRegionIdNormalizer;
 import com.tripcast.tourweather.tourspot.TourSpot;
+import com.tripcast.tourweather.tourspot.course.dto.CourseRecommendationResponse;
 import com.tripcast.tourweather.tourspot.course.dto.TourCourseResponse;
 import com.tripcast.tourweather.tourspot.course.dto.TourCourseStopResponse;
 import com.tripcast.tourweather.tourspot.course.dto.TourCourseStopWeatherResponse;
@@ -76,6 +79,39 @@ public class TourCourseService {
                 course.getSourceCourseId(),
                 stops
         );
+    }
+
+    public List<CourseRecommendationResponse> getRecommendations(int limit) {
+        return courseRepository.findAll()
+                .stream()
+                .map(this::toRecommendationOrNull)
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparing(
+                                (CourseRecommendationResponse response) ->
+                                        response.climateIndex().score())
+                        .reversed())
+                .limit(limit)
+                .toList();
+    }
+
+    private CourseRecommendationResponse toRecommendationOrNull(
+            TourCourse course
+    ) {
+        return courseStopRepository
+                .findFirstByCourseIdOrderByCourseOrderAsc(course.getId())
+                .map(firstStop -> {
+                    ClimateIndexResponse climateIndex = climateIndexService
+                            .findLatestOrNull(firstStop.getRegionId());
+                    if (climateIndex == null) {
+                        return null;
+                    }
+                    return new CourseRecommendationResponse(
+                            course.getId(),
+                            course.getSourceCourseId(),
+                            climateIndex
+                    );
+                })
+                .orElse(null);
     }
 
     private TourCourse findCourse(Long courseId) {
