@@ -2,6 +2,20 @@
 
 관광지를 검색하고, 관광코스 단위로 날씨와 관광기후지수를 통합 조회하는 백엔드 API입니다.
 
+---
+
+## 목차
+
+- [주요 기능](#주요-기능)
+- [기술 스택](#기술-스택)
+- [실행 방법](#실행-방법)
+- [프로젝트 구조](#프로젝트-구조)
+- [ERD](#erd)
+- [API 문서](#api-문서)
+- [컨벤션](#컨벤션)
+
+---
+
 ## 주요 기능
 
 - **관광지 조회**: 이름으로 관광지 검색, 관광지별 기상청 단기예보(동네예보) 조회
@@ -22,7 +36,8 @@
 | 테스트 | ![JUnit5](https://img.shields.io/badge/JUnit5-25A162?style=flat-square&logo=junit5&logoColor=white) ![Testcontainers](https://img.shields.io/badge/Testcontainers-0EA5E9?style=flat-square) ![Mockito](https://img.shields.io/badge/Mockito-78A641?style=flat-square) |
 | 빌드/배포 | ![Gradle](https://img.shields.io/badge/Gradle-02303A?style=flat-square&logo=gradle&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white) ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white) |
 
-## 실행 방법
+<details>
+<summary><h2> 실행 방법</h2></summary>
 
 ### 사전 준비
 
@@ -85,6 +100,9 @@ docker run -p 8080:8080 `
 
 이미지에는 API 키/비밀번호를 넣지 않는다 — 항상 `docker run -e`로 실행 시점에 주입한다.
 
+
+</details>
+
 ## 프로젝트 구조
 
 ```
@@ -110,6 +128,11 @@ src/main/java/com/tripcast/tourweather/
 - 관광기후지수 연동(외부 API, 배치, 환경변수) 가이드: [docs/tour-climate-api.md](docs/tour-climate-api.md)
 - DB 스키마 관리(Flyway 마이그레이션, 기존 DB 편입) 가이드: [docs/flyway-migration.md](docs/flyway-migration.md)
 - 인증(JWT, 관리자 API) 가이드: [docs/auth.md](docs/auth.md)
+
+<details>
+<summary><h2> 컨벤션 </h2></summary>
+
+
 
 ## 커밋 컨벤션
 
@@ -142,3 +165,5 @@ src/main/java/com/tripcast/tourweather/
 | ci | CI/CD 설정 변경 브랜치 |
 
 예시: `feature/admin-auth`, `chore/add-dockerfile`, `refactor/remove-spot-weather-index`
+
+</details>
