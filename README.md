@@ -2,7 +2,7 @@
 
 ## 로컬 실행 환경변수
 
-`DB_PASSWORD`, `WEATHER_API_KEY`, `TOUR_CLIMATE_API_KEY`를 매번 손으로 치기 귀찮다면:
+`DB_PASSWORD`, `WEATHER_API_KEY`, `TOUR_CLIMATE_API_KEY`를:
 
 ```powershell
 Copy-Item .env.example .env
@@ -10,8 +10,7 @@ Copy-Item .env.example .env
 . .\load-env.ps1
 ```
 
-새 터미널을 열 때마다 `. .\load-env.ps1`만 다시 실행하면 된다.
-
+새 터미널을 열 때마다 `. .\load-env.ps1` 다시 실행
 ## 문서
 
 - API 전체 목록/테스트: 앱 실행 후 `/swagger-ui.html`
