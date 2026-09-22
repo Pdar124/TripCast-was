@@ -12,22 +12,25 @@
 
 ## 기술 스택
 
-- Java 21, Spring Boot 4.1.1
-- Spring Data JPA, MySQL, Flyway(스키마 마이그레이션)
-- Spring Security, JWT(`jjwt`)
-- springdoc-openapi(Swagger UI)
-- JUnit 5, Mockito, Testcontainers(MySQL), H2
-- Gradle, Docker, GitHub Actions(CI)
+| 분야 | 기술 |
+| --- | --- |
+| Language | ![Java](https://img.shields.io/badge/Java_21-007396?style=flat-square&logo=openjdk&logoColor=white) |
+| Framework | ![Spring Boot](https://img.shields.io/badge/Spring_Boot_4.1.1-6DB33F?style=flat-square&logo=springboot&logoColor=white) ![Spring Security](https://img.shields.io/badge/Spring_Security-6DB33F?style=flat-square&logo=springsecurity&logoColor=white) |
+| Database | ![MySQL](https://img.shields.io/badge/MySQL_8-4479A1?style=flat-square&logo=mysql&logoColor=white) ![Flyway](https://img.shields.io/badge/Flyway-CC0200?style=flat-square&logo=flyway&logoColor=white) ![H2](https://img.shields.io/badge/H2-0078D4?style=flat-square) |
+| Auth | ![JWT](https://img.shields.io/badge/JWT-000000?style=flat-square&logo=jsonwebtokens&logoColor=white) |
+| API 문서 | ![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=flat-square&logo=swagger&logoColor=black) |
+| 테스트 | ![JUnit5](https://img.shields.io/badge/JUnit5-25A162?style=flat-square&logo=junit5&logoColor=white) ![Testcontainers](https://img.shields.io/badge/Testcontainers-0EA5E9?style=flat-square) ![Mockito](https://img.shields.io/badge/Mockito-78A641?style=flat-square) |
+| 빌드/배포 | ![Gradle](https://img.shields.io/badge/Gradle-02303A?style=flat-square&logo=gradle&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white) ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white) |
 
 ## 시작하기
 
-### 1. 준비물
+### 사전 준비
 
 - JDK 21
 - 로컬 MySQL 8.x (DB명 `TripCast`)
 - (선택) Docker Desktop — 컨테이너 실행 및 Testcontainers 기반 테스트용
 
-### 2. 환경변수 설정
+### 환경변수 설정
 
 `DB_PASSWORD`, `WEATHER_API_KEY`, `TOUR_CLIMATE_API_KEY`, `JWT_SECRET`, `ADMIN_USERNAME`, `ADMIN_PASSWORD`가 필요합니다.
 
@@ -39,7 +42,7 @@ Copy-Item .env.example .env
 
 새 터미널을 열 때마다 `. .\load-env.ps1`을 다시 실행해야 한다. 각 값의 발급 방법은 [환경변수](#환경변수) 섹션 참고.
 
-### 3. 실행
+### 실행
 
 ```powershell
 .\gradlew.bat bootRun
@@ -47,7 +50,7 @@ Copy-Item .env.example .env
 
 기동하면 Flyway가 스키마를 자동으로 맞추고(`docs/flyway-migration.md` 참고), `http://localhost:8080/swagger-ui.html`에서 전체 API를 확인/호출할 수 있다.
 
-### 4. 테스트
+### 테스트
 
 ```powershell
 .\gradlew.bat clean test
@@ -93,6 +96,50 @@ src/main/java/com/tripcast/tourweather/
 ├── admin/        # 관리자 전용 API
 └── common/       # 공통 설정, 예외 처리
 ```
+
+## ERD
+
+```mermaid
+erDiagram
+    TOUR_COURSE ||--o{ TOUR_COURSE_STOP : "코스에 속한 정류지"
+    TOUR_SPOT ||--o{ TOUR_COURSE_STOP : "관광지가 등장하는 지점"
+    TOUR_COURSE_STOP }o..|| REGION_CLIMATE_INDEX : "region_id 정규화 후 논리 연결 (FK 아님)"
+
+    TOUR_SPOT {
+        bigint id PK
+        varchar name
+        double latitude
+        double longitude
+    }
+
+    TOUR_COURSE {
+        bigint id PK
+        varchar source_course_id UK "공공데이터 원본 코스 아이디"
+    }
+
+    TOUR_COURSE_STOP {
+        bigint id PK
+        varchar source_spot_id UK "공공데이터 원본 지점번호"
+        bigint course_id FK
+        bigint tour_spot_id FK
+        varchar region_id "시군구 코드"
+        int course_order "UK(course_id+course_order)"
+        int travel_time
+        varchar indoor_type
+        varchar theme_code
+        varchar theme_name
+    }
+
+    REGION_CLIMATE_INDEX {
+        bigint id PK
+        varchar region_id "UK(region_id+base_date)"
+        date base_date
+        decimal score
+        varchar grade "API의 TCI_GRADE 원문"
+    }
+```
+
+컬럼별 상세 설명과 DDL은 [docs/db-table-spec.md](docs/db-table-spec.md) 참고.
 
 ## API 문서
 
