@@ -11,6 +11,22 @@ Copy-Item .env.example .env
 ```
 
 새 터미널을 열 때마다 `. .\load-env.ps1` 다시 실행
+
+## Docker로 실행
+
+```powershell
+docker build -t tripcast .
+docker run -p 8080:8080 `
+  -e DB_HOST=host.docker.internal `
+  -e DB_PASSWORD=<MySQL 비밀번호> `
+  -e WEATHER_API_KEY=<기상청 API 키> `
+  tripcast
+```
+
+컨테이너 안에서 `localhost`는 컨테이너 자기 자신을 가리키므로, 호스트 PC에서 돌고 있는 MySQL에 붙으려면 `DB_HOST=host.docker.internal`(Docker Desktop이 제공하는 호스트 접근용 주소)을 넘겨야 한다. MySQL을 별도 컨테이너로 띄울 경우엔 그 컨테이너 이름을 `DB_HOST`로 넘기면 된다.
+
+이미지에는 API 키/비밀번호를 넣지 않는다 — 항상 `docker run -e`로 실행 시점에 주입한다.
+
 ## 문서
 
 - API 전체 목록/테스트: 앱 실행 후 `/swagger-ui.html`
