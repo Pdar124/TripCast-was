@@ -9,41 +9,41 @@
 
 ```mermaid
 erDiagram
-    TOUR_COURSE ||--o{ TOUR_COURSE_STOP : "코스에 속한 정류지"
-    TOUR_SPOT ||--o{ TOUR_COURSE_STOP : "관광지가 등장하는 지점"
-    TOUR_COURSE_STOP }o..|| REGION_CLIMATE_INDEX : "region_id 정규화 후 논리 연결 (FK 아님)"
+    TOUR_COURSE["관광 코스 (tour_course)"] ||--o{ TOUR_COURSE_STOP["관광 코스 지점 (tour_course_stop)"] : "코스에 속한 정류지"
+    TOUR_SPOT["관광지 (tour_spot)"] ||--o{ TOUR_COURSE_STOP : "관광지가 등장하는 지점"
+    TOUR_COURSE_STOP }o..|| REGION_CLIMATE_INDEX["지역 관광 기후지수 (region_climate_index)"] : "region_id 정규화 후 논리 연결 (FK 아님)"
 
     TOUR_SPOT {
-        bigint id PK
-        varchar name
-        double latitude
-        double longitude
+        bigint id PK "관광지 ID"
+        varchar name "관광지명"
+        double latitude "위도"
+        double longitude "경도"
     }
 
     TOUR_COURSE {
-        bigint id PK
-        varchar source_course_id UK "공공데이터 원본 코스 아이디"
+        bigint id PK "관광 코스 ID"
+        varchar source_course_id UK "공공데이터 원본 코스 ID"
     }
 
     TOUR_COURSE_STOP {
-        bigint id PK
-        varchar source_spot_id UK "공공데이터 원본 지점번호"
-        bigint course_id FK
-        bigint tour_spot_id FK
+        bigint id PK "관광 지점 ID"
+        varchar source_spot_id UK "공공데이터 원본 지점 번호"
+        bigint course_id FK "관광 코스 ID"
+        bigint tour_spot_id FK "관광지 ID"
         varchar region_id "시군구 코드"
-        int course_order "UK(course_id+course_order)"
-        int travel_time
-        varchar indoor_type
-        varchar theme_code
-        varchar theme_name
+        int course_order "코스 방문 순서"
+        int travel_time "이동 시간(분)"
+        varchar indoor_type "실내·실외 구분"
+        varchar theme_code "테마 코드"
+        varchar theme_name "테마명"
     }
 
     REGION_CLIMATE_INDEX {
-        bigint id PK
-        varchar region_id "UK(region_id+base_date)"
-        date base_date
-        decimal score
-        varchar grade "API의 TCI_GRADE 원문"
+        bigint id PK "기후지수 ID"
+        varchar region_id "시군구 코드"
+        date base_date "기준 날짜"
+        decimal score "관광 기후지수 점수"
+        varchar grade "기후지수 등급"
     }
 ```
 
