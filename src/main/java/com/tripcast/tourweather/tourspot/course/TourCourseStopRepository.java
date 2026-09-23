@@ -19,6 +19,8 @@ public interface TourCourseStopRepository
 
     Optional<TourCourseStop> findFirstByTourSpotIdOrderByIdAsc(Long tourSpotId);
 
+    long countByCourseId(Long courseId);
+
     @Query("""
             select distinct stop.regionId
             from TourCourseStop stop

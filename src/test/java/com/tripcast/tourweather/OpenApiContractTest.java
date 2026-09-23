@@ -58,6 +58,15 @@ class OpenApiContractTest {
     }
 
     @Test
+    void 코스_목록_API가_OpenAPI에_노출된다() throws Exception {
+        mockMvc.perform(get("/v3/api-docs"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(
+                        "$.paths['/api/tour-courses']"
+                ).exists());
+    }
+
+    @Test
     void 인증_및_관리자_API가_OpenAPI에_노출된다() throws Exception {
         mockMvc.perform(get("/v3/api-docs"))
                 .andExpect(status().isOk())

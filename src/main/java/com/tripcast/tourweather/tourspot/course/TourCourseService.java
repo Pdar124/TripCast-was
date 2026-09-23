@@ -9,6 +9,9 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +23,7 @@ import com.tripcast.tourweather.tourspot.course.dto.CourseRecommendationResponse
 import com.tripcast.tourweather.tourspot.course.dto.TourCourseResponse;
 import com.tripcast.tourweather.tourspot.course.dto.TourCourseStopResponse;
 import com.tripcast.tourweather.tourspot.course.dto.TourCourseStopWeatherResponse;
+import com.tripcast.tourweather.tourspot.course.dto.TourCourseSummaryResponse;
 import com.tripcast.tourweather.tourspot.course.dto.TourCourseWeatherResponse;
 import com.tripcast.tourweather.weather.WeatherService;
 import com.tripcast.tourweather.weather.dto.WeatherResponse;
@@ -48,6 +52,33 @@ public class TourCourseService {
         this.courseStopRepository = courseStopRepository;
         this.climateIndexService = climateIndexService;
         this.weatherService = weatherService;
+    }
+
+    public Page<TourCourseSummaryResponse> searchCourses(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(
+                page,
+                size,
+                Sort.by("id").ascending()
+        );
+
+        return courseRepository.findAll(pageRequest)
+                .map(this::toSummary);
+    }
+
+    private TourCourseSummaryResponse toSummary(TourCourse course) {
+        Optional<TourCourseStop> firstStop = courseStopRepository
+                .findFirstByCourseIdOrderByCourseOrderAsc(course.getId());
+        long stopCount = courseStopRepository.countByCourseId(course.getId());
+
+        return new TourCourseSummaryResponse(
+                course.getId(),
+                course.getSourceCourseId(),
+                firstStop.map(stop -> stop.getTourSpot().getName())
+                        .orElse(null),
+                firstStop.map(TourCourseStop::getThemeName)
+                        .orElse(null),
+                stopCount
+        );
     }
 
     public TourCourseResponse getCourse(Long courseId) {

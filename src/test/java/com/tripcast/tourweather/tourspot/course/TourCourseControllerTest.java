@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -21,6 +22,7 @@ import com.tripcast.tourweather.tourspot.course.dto.CourseRecommendationResponse
 import com.tripcast.tourweather.tourspot.course.dto.TourCourseResponse;
 import com.tripcast.tourweather.tourspot.course.dto.TourCourseStopResponse;
 import com.tripcast.tourweather.tourspot.course.dto.TourCourseStopWeatherResponse;
+import com.tripcast.tourweather.tourspot.course.dto.TourCourseSummaryResponse;
 import com.tripcast.tourweather.tourspot.course.dto.TourCourseWeatherResponse;
 
 @WebMvcTest(TourCourseController.class)
@@ -32,6 +34,29 @@ class TourCourseControllerTest {
 
     @MockitoBean
     private TourCourseService tourCourseService;
+
+    @Test
+    void 코스_목록을_요약_정보와_함께_조회한다() throws Exception {
+        when(tourCourseService.searchCourses(0, 20))
+                .thenReturn(new PageImpl<>(List.of(
+                        new TourCourseSummaryResponse(
+                                1L,
+                                "TH01",
+                                "서울시청",
+                                "역사",
+                                3L
+                        )
+                )));
+
+        mockMvc.perform(get("/api/tour-courses"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].courseId").value(1))
+                .andExpect(jsonPath("$.content[0].sourceCourseId")
+                        .value("TH01"))
+                .andExpect(jsonPath("$.content[0].representativeSpotName")
+                        .value("서울시청"))
+                .andExpect(jsonPath("$.content[0].stopCount").value(3));
+    }
 
     @Test
     void 코스와_관광지_목록을_조회한다() throws Exception {
